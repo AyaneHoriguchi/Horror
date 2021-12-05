@@ -11,8 +11,12 @@ public class CharacterMoveController : MonoBehaviour
     public float playerSpeed = 2.0f;
     public float jumppower = 1.0f;
     public Animator Animator;
+    public float gravityValue = -9.81f;
 
-   
+    private Vector3 oldVelocity;
+
+    public FootStepsSoundManager FootStepsSoundManager;
+  
 
     // Update is called once per frame
     void Update()
@@ -30,6 +34,33 @@ public class CharacterMoveController : MonoBehaviour
 
         Animator.SetFloat("MovePower", movePower);
 
+        if(movePower > 0)
+        {
+            FootStepsSoundManager.PlayFootStepSE();
+        }
+
+        else
+        {
+            FootStepsSoundManager.StopFootStepSE();
+        }
+
+
+
+        playerVelocity = move;
+        playerVelocity = Vector3.Slerp(oldVelocity, playerVelocity, playerSpeed * Time.deltaTime);
+        oldVelocity = playerVelocity;
+
+        if(playerVelocity.magnitude > 0f)
+        {
+            transform.LookAt(transform.position + playerVelocity);
+        }
+
+        playerVelocity.y += gravityValue * Time.deltaTime;
+        CharacterController.Move(playerVelocity * Time.deltaTime);
+
+
+
+
 
         CharacterController.Move(move * Time.deltaTime * playerSpeed);
 
@@ -38,6 +69,10 @@ public class CharacterMoveController : MonoBehaviour
             gameObject.transform.forward = move;
 
         }
+
+        playerVelocity.y += gravityValue * Time.deltaTime;
+        CharacterController.Move(playerVelocity * Time.deltaTime);
+
 
         
     }
